@@ -21,7 +21,7 @@ const create = async () => {
 /* eslint-disable no-unused-vars */
 app.get('/text-to-speech', async (req, res, next) => {
     
-    const { key, region, phrase, file } = req.query;
+    const { key, region, phrase, file,speed,pitch } = req.query;
     
     if (!key || !region || !phrase) res.status(404).send('Invalid query string');
     

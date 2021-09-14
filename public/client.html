@@ -35,27 +35,41 @@
         </td>
       </tr>
       <tr>
+       <td></td>
+       <td>
+      <label for="speed" id="speedlabel">Speaking speed: 1.90</label>
+  <input type="range" id="speed" name="speed" min="-100" max="200" value="0" class="slider__input" data-bi-id="demo-rate-slider" aria-label="Speaking speed">
+     </td>
+      </tr>
+  <tr>
+<td></td>
+       <td>
+<label for="pitch" id="pitchlabel">Pitch: 1.28</label>
+<input type="range" id="pitch" name="pitch" min="-50" max="50" value="0" class="slider__input" data-bi-id="demo-pitch-slider" aria-label="Pitch">
+     </td>
+      </tr>      
+<tr>
         <td align="right" valign="top">Input Text (max 255 char)</td>
         <td><textarea id="phraseDiv" style="display: inline-block;width:818px;height:340px" maxlength="255"
-            onblur="updateSrc()">all good men must come to the aid</textarea></td>
+            onblur="updateSrc()">สวัสดีสบายดีไหม</textarea></td>
       </tr>
       <tr>
         <td align="right">
-          Stream directly from Azure Cognitive Services
         </td>
         <td>
           <div>
-            <button id="clientAudioAzure" onclick="getSpeechFromAzure()">Get directly from Azure</button>
+            <button id="clientAudioAzure" onclick="getSpeechFromAzure()">Listen and download audio file</button>
           </div>
         </td>
+        <td> <a download id="downloadAudio" style="display:none;" href="Javascript:void(0)"></a></td>
       </tr>
    <tr> </tr>
   <tr></tr>
       <tr>
         <td align="right">
-          Stream audio from file on server</td>
+</td>
         <td>
-          <audio id="serverAudioFile" controls preload="none" onerror="DisplayError()">
+          <audio style="display:none;" id="serverAudioFile" controls preload="none" onerror="DisplayError()">
           </audio>
         </td>
       </tr>
@@ -92,7 +106,7 @@
     var queryString = null;
 
     var audioType = "audio/mpeg";
-    var serverSrc = "/text-to-speech";
+    var serverSrc = "/text-to-speech-1";
 
     //document.getElementById('serverAudioStream').disabled = true;
     document.getElementById('serverAudioFile').disabled = true;
@@ -105,7 +119,8 @@
       resourceKey = document.getElementById('resourceKey').value.trim();
       resourceRegion = document.getElementById('resourceRegion').value.trim();
       phrase = document.getElementById('phraseDiv').value.trim();
-
+//      let speed=document.getElementById("speed").value
+  //    let pitch=document.getElementById("pitch").value
       // server control - by file
       var serverAudioFileControl = document.getElementById('serverAudioFile');
       queryString += `%file=true`;
@@ -139,11 +154,14 @@
       // authorization for Speech service
       var speechConfig = SpeechSDK.SpeechConfig.fromSubscription(resourceKey, resourceRegion);
 
-      // new Speech object
-      synthesizer = new SpeechSDK.SpeechSynthesizer(speechConfig);
-
-      synthesizer.speakTextAsync(
-        phrase,
+     // new Speech object
+     synthesizer = new SpeechSDK.SpeechSynthesizer(speechConfig);
+     let speed=document.getElementById("speed").value
+     let pitch=document.getElementById("pitch").value
+     let ssml = '<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US"><voice name="th-TH-Pattara"><prosody rate="'+speed+'" pitch="'+pitch+'%">'+phrase+'</prosody></voice></speak>'; 
+     console.log(ssml)
+   synthesizer.speakSsmlAsync(
+        ssml,
         function (result) {
 
           // Success function
@@ -155,7 +173,9 @@
             audioElement = document.getElementById("clientAudioAzure");
             const blob = new Blob([result.audioData], { type: "audio/mpeg" });
             const url = window.URL.createObjectURL(blob);
-
+            document.getElementById("downloadAudio").href=url
+            document.getElementById("downloadAudio").click()	
+            console.log("Hi, hello", JSON.stringify(result))
           } else if (result.reason === SpeechSDK.ResultReason.Canceled) {
             // display Error
             throw (result.errorDetails);
@@ -195,7 +215,22 @@
         document.getElementById('content').style.display = 'block';
       }
     });
-
+   var o = document.getElementById("speed"),
+                ft = document.getElementById("speedlabel"),
+                s = document.getElementById("pitch"),
+                et = document.getElementById("pitchlabel");
+     s.oninput = function () {
+                var n = ((s.value - s.min) / (s.max - s.min)) * 2,
+                    i;
+                i = Math.abs(n) < 1 ? n.toPrecision(2) : n.toPrecision(3);
+                et.innerText = "Pitch: " + i;
+            };
+            o.oninput = function () {
+                var n = ((o.value - o.min) / (o.max - o.min)) * 3,
+                    i;
+                i = Math.abs(n) < 1 ? n.toPrecision(2) : n.toPrecision(3);
+                ft.innerText = "Speaking speed: " + i;
+            };
   </script>
 </body>
 

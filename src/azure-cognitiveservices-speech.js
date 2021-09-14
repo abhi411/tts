@@ -20,18 +20,24 @@ const textToSpeech = async (key, region, text, filename)=> {
         
         const speechConfig = sdk.SpeechConfig.fromSubscription(key, region);
         speechConfig.speechSynthesisOutputFormat = 5; // mp3
-        
+        speechConfig.speechRecognitionLanguage='th-TH'
+       speechConfig.speechSynthesisLanguage='th-TH'
+        console.log("speech-----------------")
         let audioConfig = null;
         
         if (filename) {
             audioConfig = sdk.AudioConfig.fromAudioFileOutput(filename);
         }
-        
-        const synthesizer = new sdk.SpeechSynthesizer(speechConfig, audioConfig);
+        let ssml = '<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US"><voice name="th-TH-Pattara"><prosody rate="20%" pitch="5%">'+text+'</prosody></voice></speak>'
+        console.log("hherer",ssml)
+//        const synthesizer = new sdk.SpeechSynthesizer(speechConfig, audioConfig);
+// synthesizer.speakSsmlAsync(
+  //      ssml,
+  const synthesizer = new sdk.SpeechSynthesizer(speechConfig, audioConfig);
 
         synthesizer.speakTextAsync(
-            text,
-            result => {
+            text,    
+        result => {
                 
                 const { audioData } = result;
 
@@ -52,6 +58,7 @@ const textToSpeech = async (key, region, text, filename)=> {
                 }
             },
             error => {
+console.log("here ==", error)
                 synthesizer.close();
                 reject(error);
             }); 
