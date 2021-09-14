@@ -21,8 +21,9 @@ const create = async () => {
 /* eslint-disable no-unused-vars */
 app.get('/text-to-speech', async (req, res, next) => {
     
-    const { key, region, phrase, file,speed,pitch } = req.query;
-    
+    const { phrase, file,speed,pitch } = req.query;
+    const key="f6b7621c62d0405faa0d4e6fd27d8a5f"
+    const region='eastus'
     if (!key || !region || !phrase) res.status(404).send('Invalid query string');
     
     let fileName = null;
@@ -32,7 +33,7 @@ app.get('/text-to-speech', async (req, res, next) => {
         fileName = `./temp/stream-from-file-${timeStamp()}.mp3`;
     }
     
-    const audioStream = await textToSpeech(key, region, phrase, fileName);
+    const audioStream = await textToSpeech(key, region, phrase, fileName, speed, pitch);
     res.set({
         'Content-Type': 'audio/mpeg',
         'Transfer-Encoding': 'chunked'
